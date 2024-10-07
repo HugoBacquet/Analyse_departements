@@ -569,35 +569,3 @@ selected_column = st.selectbox('Select Column:', sorted_column_list)
 # Display the main map with the selected column data
 create_map(selected_column)
 
-
-import asyncio
-import os
-from pyppeteer import launch
-import streamlit as st
-
-async def capture_screenshot(url, filename):
-    # Lancer le navigateur Chromium en mode headless
-    browser = await launch(headless=True, args=['--no-sandbox', '--disable-setuid-sandbox'])
-    page = await browser.newPage()
-    await page.goto(url)
-    
-    # Capture de la capture d'écran
-    await page.screenshot({'path': filename, 'fullPage': True})
-    
-    await browser.close()
-
-def capture_all_elements():
-    url = "https://analysedepartements-cd05-pinpon.streamlit.app/"
-    elements = ['Taux d\'épargne brute', 'Délai de désendettement', 'Epargne brute par habitant (INSEE)']  # Trois premiers éléments du menu
-
-    for element in elements:
-        filename = f"{element}.png".replace(" ", "_")
-        st.write(f"Capturing screenshot for: {element}")
-        asyncio.run(capture_screenshot(url, filename))
-        st.write(f"Saved screenshot: {filename}")
-
-# Ajouter un bouton dans Streamlit pour lancer les captures
-if st.button("Lancer les captures d'écran"):
-    capture_all_elements()
-
-
