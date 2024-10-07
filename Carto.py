@@ -280,8 +280,6 @@ def create_map(selected_column):
 
         if selected_column in column_mapping:
             column_2022, column_2023 = column_mapping[selected_column]
-
-            # Handle values and formats for percentage or raw numbers
             # Handle values and formats for percentage or raw numbers
             if 'Taux' in selected_column:
                 value_2022 = f"{row[column_2022] * 100:,.0f} %".replace(",", " ").replace(".", ",") if pd.notna(row[column_2022]) else "0,00 %"
@@ -408,6 +406,7 @@ def create_top_table(selected_column, m):
 
     # Get the top 5 departments
     top_5 = all_departments[['Département', 'Metric', 'Rank']].sort_values(by='Metric', ascending=ascending).head(5)
+    bottom_3 = all_departments[['Département', 'Metric', 'Rank']].sort_values(by='Metric', ascending=ascending).tail(3)
 
     # Check if 'Hautes-Alpes' exists in the DataFrame
     if 'Hautes-Alpes' in all_departments['Département'].values:
@@ -415,11 +414,10 @@ def create_top_table(selected_column, m):
         hautes_alpes_rank = all_departments.loc[all_departments['Département'] == 'Hautes-Alpes', 'Rank'].values[0]
 
         # Add 'Hautes-Alpes' to the top 5 DataFrame if it's not already there
-        if 'Hautes-Alpes' not in top_5['Département'].values:
+    if 'Hautes-Alpes' not in top_5['Département'].values and 'Hautes-Alpes' not in bottom_3['Département'].values:
             top_5 = pd.concat([top_5, pd.DataFrame({'Département': ['Hautes-Alpes'], 'Metric': [hautes_alpes_metric], 'Rank': [hautes_alpes_rank]})], ignore_index=True)
 
     # Get the bottom 3 departments
-    bottom_3 = all_departments[['Département', 'Metric', 'Rank']].sort_values(by='Metric', ascending=ascending).tail(3)
 
     # Create HTML table for the top results
     table_html = f"""
@@ -455,9 +453,9 @@ def create_top_table(selected_column, m):
         position = int(row['Rank'])
         department_name = row['Département']
         value_to_display = f"{row['Metric']:.2f} %".replace(",", " ").replace(".", ",") if selected_column in column_mapping else f"{row['Metric']:,.2f}".replace(",", " ").replace(".", ",")
-
+        row_bg_color = "#FF6961" if department_name == 'Hautes-Alpes' else "white"
         table_html += f"""
-        <tr style="border-top: 1px solid grey; background-color: white;">
+        <tr style="border-top: 1px solid grey; background-color: {row_bg_color};">
             <td style="text-align: center; font-size: 14px; font-weight: bold; color: black; padding: 2px; border-right: 1px solid grey;">{position}</td>
             <td style="text-align: center; font-size: 14px; font-weight: bold; color: black; padding: 2px; border-right: 1px solid grey;">{department_name}</td>
             <td style="text-align: center; font-size: 14px; font-weight: bold; color: black; padding: 2px;">{value_to_display}</td>
