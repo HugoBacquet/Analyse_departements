@@ -284,12 +284,12 @@ def create_map(selected_column):
             # Handle values and formats for percentage or raw numbers
             # Handle values and formats for percentage or raw numbers
             if 'Taux' in selected_column:
-                value_2022 = f"{row[column_2022] * 100:,.2f} %".replace(",", " ").replace(".", ",") if pd.notna(row[column_2022]) else "0,00 %"
-                value_2023 = f"{row[column_2023] * 100:,.2f} %".replace(",", " ").replace(".", ",") if pd.notna(row[column_2023]) else "0,00 %"
+                value_2022 = f"{row[column_2022] * 100:,.0f} %".replace(",", " ").replace(".", ",") if pd.notna(row[column_2022]) else "0,00 %"
+                value_2023 = f"{row[column_2023] * 100:,.0f} %".replace(",", " ").replace(".", ",") if pd.notna(row[column_2023]) else "0,00 %"
                 evolution = f"{(row[column_2023] - row[column_2022]) / row[column_2022] * 100:,.2f} %".replace(",", " ").replace(".", ",") if pd.notna(row[column_2023]) and pd.notna(row[column_2022]) and row[column_2022] != 0 else "N/A"
             else:
-                value_2022 = f"{row[column_2022]:,.2f}".replace(",", " ").replace(".", ",") if pd.notna(row[column_2022]) else "0,00"
-                value_2023 = f"{row[column_2023]:,.2f}".replace(",", " ").replace(".", ",") if pd.notna(row[column_2023]) else "0,00"
+                value_2022 = f"{row[column_2022]:,.0f}".replace(",", " ").replace(".", ",") if pd.notna(row[column_2022]) else "0,00"
+                value_2023 = f"{row[column_2023]:,.0f}".replace(",", " ").replace(".", ",") if pd.notna(row[column_2023]) else "0,00"
                 evolution = f"{(row[column_2023] - row[column_2022]) / row[column_2022] * 100:,.2f} %".replace(",", " ").replace(".", ",") if pd.notna(row[column_2023]) and pd.notna(row[column_2022]) and row[column_2022] != 0 else "N/A"
             # Create the HTML table
             table_html = f"""
@@ -315,7 +315,7 @@ def create_map(selected_column):
             """
         else:
             # For other columns, handle as a single value for 2023
-            value = f"{int(row[selected_column]):,}".replace(',', ' ') if pd.notna(row[selected_column]) else '0'
+            value = f"{int(row[selected_column]):,}".replace(",", " ") if pd.notna(row[selected_column]) else '0'
             table_html = f"""
             <table style="border: 1px solid black; border-collapse: collapse; background-color: white; width: 200px;">
                 <thead style="background-color: {header_bg_color}; color: black;">
@@ -438,8 +438,7 @@ def create_top_table(selected_column, m):
     for i, row in top_5.iterrows():
         position = int(row['Rank'])
         department_name = row['Département']
-        value_to_display = f"{row['Metric']:.2f} %" if selected_column in column_mapping else f"{row['Metric']:,.2f}".replace(",", " ")
-
+        value_to_display = f"{row['Metric']:,.2f} %".replace(",", " ").replace(".", ",") if selected_column in column_mapping else f"{row['Metric']:,.2f}".replace(",", " ").replace(".", ",")
         # Determine row background color (red for 'Hautes-Alpes')
         row_bg_color = "#FF6961" if department_name == 'Hautes-Alpes' else "white"
 
@@ -455,7 +454,7 @@ def create_top_table(selected_column, m):
     for i, row in bottom_3.iterrows():
         position = int(row['Rank'])
         department_name = row['Département']
-        value_to_display = f"{row['Metric']:.2f} %" if selected_column in column_mapping else f"{row['Metric']:,.2f}".replace(",", " ")
+        value_to_display = f"{row['Metric']:.2f} %".replace(",", " ").replace(".", ",") if selected_column in column_mapping else f"{row['Metric']:,.2f}".replace(",", " ").replace(".", ",")
 
         table_html += f"""
         <tr style="border-top: 1px solid grey; background-color: white;">
@@ -571,3 +570,4 @@ selected_column = st.selectbox('Select Column:', sorted_column_list)
 
 # Display the main map with the selected column data
 create_map(selected_column)
+
