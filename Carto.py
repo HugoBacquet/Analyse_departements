@@ -589,6 +589,8 @@ chrome_options = Options()
 chrome_options.add_argument('--headless')  # Nécessaire pour l'exécution sur un serveur
 chrome_options.add_argument('--no-sandbox')
 chrome_options.add_argument('--disable-dev-shm-usage')
+chrome_options.binary_location = '/usr/bin/chromium-browser'  # Chemin vers le binaire Chromium
+
 
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
