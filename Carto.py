@@ -571,24 +571,33 @@ create_map(selected_column)
 
 
 import asyncio
-from pyppeteer import launch
 import os
+from pyppeteer import launch
+import streamlit as st
 
 async def capture_screenshot(url, filename):
-    # Lance le navigateur Chromium en mode headless
-    browser = await launch(headless=True, args=['--no-sandbox'])
+    # Lancer le navigateur Chromium en mode headless
+    browser = await launch(headless=True, args=['--no-sandbox', '--disable-setuid-sandbox'])
     page = await browser.newPage()
     await page.goto(url)
-
-    # Capture la capture d'écran de la page entière
+    
+    # Capture de la capture d'écran
     await page.screenshot({'path': filename, 'fullPage': True})
     
     await browser.close()
 
-# Exemple d'utilisation
-url = "https://analysedepartements-cd05-pinpon.streamlit.app/"
-filename = "screenshot.png"
+def capture_all_elements():
+    url = "https://analysedepartements-cd05-pinpon.streamlit.app/"
+    elements = ['Taux d\'épargne brute', 'Délai de désendettement', 'Epargne brute par habitant (INSEE)']  # Trois premiers éléments du menu
 
-asyncio.run(capture_screenshot(url, filename))
+    for element in elements:
+        filename = f"{element}.png".replace(" ", "_")
+        st.write(f"Capturing screenshot for: {element}")
+        asyncio.run(capture_screenshot(url, filename))
+        st.write(f"Saved screenshot: {filename}")
+
+# Ajouter un bouton dans Streamlit pour lancer les captures
+if st.button("Lancer les captures d'écran"):
+    capture_all_elements()
 
 
