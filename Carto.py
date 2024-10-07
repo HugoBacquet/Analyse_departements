@@ -569,3 +569,92 @@ selected_column = st.selectbox('Select Column:', sorted_column_list)
 # Display the main map with the selected column data
 create_map(selected_column)
 
+
+import streamlit as st
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from PIL import Image
+import zipfile
+import os
+import time
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.options import Options
+
+
+chrome_options = Options()
+chrome_options.add_argument('--headless')  # Nécessaire pour l'exécution sur un serveur
+chrome_options.add_argument('--no-sandbox')
+chrome_options.add_argument('--disable-dev-shm-usage')
+
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+
+# URL de votre application Streamlit locale
+streamlit_url = 'https://analysedepartements-cd05-pinpon.streamlit.app/'  # Remplacez par le port de votre application Streamlit
+
+# Dossier de stockage des captures
+capture_folder = 'captures'
+if not os.path.exists(capture_folder):
+    os.makedirs(capture_folder)
+
+# Fonction pour prendre les captures d'écran
+def take_screenshots():
+    driver.get(streamlit_url)
+    wait = WebDriverWait(driver, 20)
+
+    # Trouver le menu déroulant et les options
+    select_element = wait.until(EC.presence_of_element_located((By.TAG_NAME, 'select')))
+    options = select_element.find_elements(By.TAG_NAME, 'option')
+
+    # Limiter aux trois premiers éléments du menu pour le test
+    for i in range(min(3, len(options))):  # Limite aux 3 premiers éléments
+        option_value = options[i].get_attribute('value')
+        
+        # Sélectionner l'option
+        select = Select(select_element)
+        select.select_by_value(option_value)
+
+        # Attendre que la carte soit mise à jour (ajuster le délai si nécessaire)
+        time.sleep(5)
+
+        # Prendre une capture d'écran complète
+        screenshot_path = os.path.join(capture_folder, f'{option_value}.png')
+        driver.save_screenshot('full_screenshot.png')
+
+        # Charger l'image et la rogner pour n'afficher que la carte (ajustez les coordonnées)
+        image = Image.open('full_screenshot.png')
+        cropped_image = image.crop((100, 200, 1820, 1080))  # Ajustez les coordonnées selon l'emplacement de la carte
+        cropped_image.save(screenshot_path)
+
+        st.write(f'Capture d\'écran sauvegardée pour {option_value}.')
+
+# Fonction pour créer un fichier ZIP des captures
+def create_zip():
+    zip_path = os.path.join(capture_folder, 'captures.zip')
+    with zipfile.ZipFile(zip_path, 'w') as zipf:
+        for root, _, files in os.walk(capture_folder):
+            for file in files:
+                if file.endswith('.png'):
+                    zipf.write(os.path.join(root, file), file)
+    return zip_path
+
+# --- Interface Streamlit ---
+st.title("Capture d'écran de la carte")
+
+# Bouton pour lancer les captures
+if st.button('Lancer les captures d\'écran'):
+    take_screenshots()
+    st.success('Captures d\'écran terminées.')
+
+# Bouton pour télécharger le ZIP
+if st.button('Télécharger les captures (ZIP)'):
+    zip_file = create_zip()
+    with open(zip_file, 'rb') as f:
+        st.download_button('Télécharger le fichier ZIP', f, file_name='captures.zip')
+
+# Fermer le navigateur à la fin
+driver.quit()
+
