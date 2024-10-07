@@ -229,6 +229,7 @@ def create_map(selected_column):
         }
     ).add_to(m)
 
+
     # --- Add title table to the map ---
     def add_title_table(title, offset_x, offset_y):
         table_html = f"""
@@ -281,15 +282,15 @@ def create_map(selected_column):
             column_2022, column_2023 = column_mapping[selected_column]
 
             # Handle values and formats for percentage or raw numbers
+            # Handle values and formats for percentage or raw numbers
             if 'Taux' in selected_column:
-                value_2022 = f"{row[column_2022] * 100:,.2f} %" if pd.notna(row[column_2022]) else "0 %"
-                value_2023 = f"{row[column_2023] * 100:,.2f} %" if pd.notna(row[column_2023]) else "0 %"
-                evolution = f"{(row[column_2023] - row[column_2022]) / row[column_2022] * 100:,.2f} %" if pd.notna(row[column_2023]) and pd.notna(row[column_2022]) and row[column_2022] != 0 else "N/A"
+                value_2022 = f"{row[column_2022] * 100:,.2f} %".replace(",", " ").replace(".", ",") if pd.notna(row[column_2022]) else "0,00 %"
+                value_2023 = f"{row[column_2023] * 100:,.2f} %".replace(",", " ").replace(".", ",") if pd.notna(row[column_2023]) else "0,00 %"
+                evolution = f"{(row[column_2023] - row[column_2022]) / row[column_2022] * 100:,.2f} %".replace(",", " ").replace(".", ",") if pd.notna(row[column_2023]) and pd.notna(row[column_2022]) and row[column_2022] != 0 else "N/A"
             else:
-                value_2022 = f"{row[column_2022]:,.2f}" if pd.notna(row[column_2022]) else "0"
-                value_2023 = f"{row[column_2023]:,.2f}" if pd.notna(row[column_2023]) else "0"
-                evolution = f"{(row[column_2023] - row[column_2022]) / row[column_2022] * 100:,.2f} %" if pd.notna(row[column_2023]) and pd.notna(row[column_2022]) and row[column_2022] != 0 else "N/A"
-
+                value_2022 = f"{row[column_2022]:,.2f}".replace(",", " ").replace(".", ",") if pd.notna(row[column_2022]) else "0,00"
+                value_2023 = f"{row[column_2023]:,.2f}".replace(",", " ").replace(".", ",") if pd.notna(row[column_2023]) else "0,00"
+                evolution = f"{(row[column_2023] - row[column_2022]) / row[column_2022] * 100:,.2f} %".replace(",", " ").replace(".", ",") if pd.notna(row[column_2023]) and pd.notna(row[column_2022]) and row[column_2022] != 0 else "N/A"
             # Create the HTML table
             table_html = f"""
             <table style="border: 1px solid black; border-collapse: collapse; background-color: white; width: 200px;">
@@ -299,11 +300,11 @@ def create_map(selected_column):
                 <tbody>
                     <tr style="border-top: 1px solid black;">
                         <td style="text-align: center; font-size: 16px; font-weight: bold; border-right: 1px solid black; color: black;">2022</td>
-                        <td style="text-align: center; font-size: 16px; font-weight: bold; color: black;">{value_2022}</td>
+                        <td style="text-align: center; font-size: 16px; font-weight: bold; color: black;">{value_2022} €</td>
                     </tr>
                     <tr style="border-top: 1px solid black;">
                         <td style="text-align: center; font-size: 16px; font-weight: bold; border-right: 1px solid black; color:black;">2023</td>
-                        <td style="text-align: center; font-size: 16px; font-weight: bold; color:black;">{value_2023}</td>
+                        <td style="text-align: center; font-size: 16px; font-weight: bold; color:black;">{value_2023} €</td>
                     </tr>
                     <tr style="border-top: 1px solid black;">
                         <td style="text-align: center; font-size: 16px; font-weight: bold; border-right: 1px solid black; color: black;">Evolution</td>
@@ -356,7 +357,7 @@ def create_map(selected_column):
     add_logo(m, './logo.png', offset_x=-750, offset_y=50)
 
     # Display the map in Streamlit
-    st_folium(m, width=1400, height=900)
+    st_folium(m, width=1400, height=1000)
 
 def create_top_table(selected_column, m):
     # Get all departments for the top table calculation
@@ -467,7 +468,7 @@ def create_top_table(selected_column, m):
     table_html += "</tbody></table>"
 
     # Add the top table to the map
-    table_location = (49.5, -16)  # Adjust the location as needed
+    table_location = (50, -16)  # Adjust the location as needed
     folium.Marker(
         location=[table_location[0], table_location[1]],
         icon=folium.DivIcon(html=table_html)
@@ -570,4 +571,3 @@ selected_column = st.selectbox('Select Column:', sorted_column_list)
 
 # Display the main map with the selected column data
 create_map(selected_column)
-
