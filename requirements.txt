@@ -6,8 +6,5 @@ streamlit
 streamlit-folium
 openpyxl
 streamlit
-selenium
-webdriver-manager
+pyppeteer
 pillow
-chromium-browser
-chromium-chromedriver
