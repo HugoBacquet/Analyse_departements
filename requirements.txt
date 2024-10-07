@@ -5,3 +5,8 @@ shapely
 streamlit
 streamlit-folium
 openpyxl
+streamlit
+selenium
+webdriver-manager
+pillow
+
