@@ -5,11 +5,12 @@ from shapely.geometry import Polygon
 import streamlit as st
 from streamlit_folium import st_folium
 import base64
+import os
 
 # Paths to the data files
-excel_file_path = './Extraction données comptable 2023.xlsx'
-geojson_file_path = './a-dep2021.json'
-comparison_excel_path = './Eléments de comparaison.xlsx'
+excel_file_path = os.path.abspath('./Extraction données comptable 2023.xlsx')
+geojson_file_path = os.path.abspath('./a-dep2021.json')
+comparison_excel_path = os.path.abspath('./Eléments de comparaison.xlsx')
 
 # Set the Streamlit page configuration
 st.set_page_config(layout="wide")
